@@ -18,7 +18,7 @@
     },
     "onnxruntime": {
       "baseline": "1.21.0",
-      "port-version": 0
+      "port-version": 1
     },
     "protobuf": {
       "baseline": "onnxruntime",

@@ -8,6 +8,7 @@ vcpkg_from_github(
     "02-add-static-lib.patch"
     "03-fix-dll.patch"
     "04-fix-android-binary-size.patch"
+    "05-add-dependencies-to-config.patch"
 )
 
 vcpkg_check_features(
@@ -19,9 +20,9 @@ vcpkg_check_features(
 vcpkg_cmake_configure(
   SOURCE_PATH "${SOURCE_PATH}/cmake"
   OPTIONS
-    ${FEATURE_OPTIONS}
     -Donnxruntime_USE_VCPKG=ON
     -Donnxruntime_BUILD_SHARED_LIB=ON
+    ${FEATURE_OPTIONS}
 )
 
 vcpkg_cmake_install()
