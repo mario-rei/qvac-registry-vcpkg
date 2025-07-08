@@ -1,0 +1,24 @@
+From 2460a1ec1f66476875c415cf40768515bed560be Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jes=C3=BAs?= <jesus.mb.1995@gmail.com>
+Date: Tue, 24 Jun 2025 18:53:07 +0200
+Subject: [PATCH] cpp wrappers vulkan
+
+---
+ ggml/src/ggml-vulkan/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ggml/src/ggml-vulkan/CMakeLists.txt b/ggml/src/ggml-vulkan/CMakeLists.txt
+index 39f022f3..c7f4e715 100644
+--- a/ggml/src/ggml-vulkan/CMakeLists.txt
++++ b/ggml/src/ggml-vulkan/CMakeLists.txt
+@@ -78,6 +78,7 @@ if (Vulkan_FOUND)
+ 
+     target_link_libraries(ggml-vulkan PRIVATE Vulkan::Vulkan)
+     target_include_directories(ggml-vulkan PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
++    target_include_directories(ggml-vulkan PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/vulkan_cpp_wrapper/include")
+ 
+     # Workaround to the "can't dereference invalidated vector iterator" bug in clang-cl debug build
+     # Posssibly relevant: https://stackoverflow.com/questions/74748276/visual-studio-no-displays-the-correct-length-of-stdvector
+-- 
+2.48.1
+

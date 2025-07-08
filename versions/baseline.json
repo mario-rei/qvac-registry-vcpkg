@@ -12,6 +12,10 @@
       "baseline": "onnxruntime",
       "port-version": 0
     },
+    "llama-cpp": {
+      "baseline": "5753",
+      "port-version": 0
+    },
     "onnx": {
       "baseline": "onnxruntime",
       "port-version": 0

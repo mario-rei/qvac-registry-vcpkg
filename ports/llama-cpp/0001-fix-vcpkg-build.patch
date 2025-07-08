@@ -1,0 +1,175 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 50801cdc..8f37f78a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -214,7 +214,7 @@ endif()
+ include(GNUInstallDirs)
+ include(CMakePackageConfigHelpers)
+ 
+-set(LLAMA_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Location of header  files")
++set(LLAMA_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/llama CACHE PATH "Location of header  files")
+ set(LLAMA_LIB_INSTALL_DIR     ${CMAKE_INSTALL_LIBDIR}     CACHE PATH "Location of library files")
+ set(LLAMA_BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Location of binary  files")
+ 
+@@ -226,15 +226,26 @@ set_target_properties(llama
+     PROPERTIES
+         PUBLIC_HEADER "${LLAMA_PUBLIC_HEADERS}")
+ 
+-install(TARGETS llama LIBRARY PUBLIC_HEADER)
++install(
++  TARGETS llama
++  EXPORT llama-targets
++  PUBLIC_HEADER
++    DESTINATION ${LLAMA_INCLUDE_INSTALL_DIR})
++
++install(
++  EXPORT llama-targets
++  FILE llama-targets.cmake
++  NAMESPACE llama::
++  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/llama)
++
++install(
++  FILES ${CMAKE_CURRENT_BINARY_DIR}/llama-config.cmake
++  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/llama)
+ 
+ configure_package_config_file(
+-        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llama-config.cmake.in
+-        ${CMAKE_CURRENT_BINARY_DIR}/llama-config.cmake
+-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/llama
+-    PATH_VARS LLAMA_INCLUDE_INSTALL_DIR
+-              LLAMA_LIB_INSTALL_DIR
+-              LLAMA_BIN_INSTALL_DIR )
++  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llama-config.cmake.in
++  ${CMAKE_CURRENT_BINARY_DIR}/llama-config.cmake
++  INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/llama)
+ 
+ write_basic_package_version_file(
+         ${CMAKE_CURRENT_BINARY_DIR}/llama-version.cmake
+@@ -243,7 +254,7 @@ write_basic_package_version_file(
+ 
+ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/llama-config.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/llama-version.cmake
+-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/llama)
++        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/llama)
+ 
+ install(
+     FILES convert_hf_to_gguf.py
+diff --git a/cmake/llama-config.cmake.in b/cmake/llama-config.cmake.in
+index 90cbec5b..5a1d6a8a 100644
+--- a/cmake/llama-config.cmake.in
++++ b/cmake/llama-config.cmake.in
+@@ -5,26 +5,9 @@ set(LLAMA_SHARED_LIB   @BUILD_SHARED_LIBS@)
+ 
+ @PACKAGE_INIT@
+ 
+-set_and_check(LLAMA_INCLUDE_DIR "@PACKAGE_LLAMA_INCLUDE_INSTALL_DIR@")
+-set_and_check(LLAMA_LIB_DIR     "@PACKAGE_LLAMA_LIB_INSTALL_DIR@")
+-set_and_check(LLAMA_BIN_DIR     "@PACKAGE_LLAMA_BIN_INSTALL_DIR@")
++include(CMakeFindDependencyMacro)
++find_dependency(ggml CONFIG REQUIRED)
+ 
+-find_package(ggml REQUIRED HINTS ${LLAMA_LIB_DIR}/cmake)
++include("${CMAKE_CURRENT_LIST_DIR}/llama-targets.cmake")
+ 
+-find_library(llama_LIBRARY llama
+-    REQUIRED
+-    HINTS ${LLAMA_LIB_DIR}
+-    NO_CMAKE_FIND_ROOT_PATH
+-)
+-
+-add_library(llama UNKNOWN IMPORTED)
+-set_target_properties(llama
+-    PROPERTIES
+-        INTERFACE_INCLUDE_DIRECTORIES "${LLAMA_INCLUDE_DIR}"
+-        INTERFACE_LINK_LIBRARIES "ggml::ggml;ggml::ggml-base;"
+-        IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
+-        IMPORTED_LOCATION "${llama_LIBRARY}"
+-        INTERFACE_COMPILE_FEATURES c_std_90
+-        POSITION_INDEPENDENT_CODE ON)
+-
+-check_required_components(Llama)
++check_required_components(llama)
+diff --git a/ggml/CMakeLists.txt b/ggml/CMakeLists.txt
+index 4e7399f9..06939be3 100644
+--- a/ggml/CMakeLists.txt
++++ b/ggml/CMakeLists.txt
+@@ -277,8 +277,15 @@ set_target_properties(ggml PROPERTIES PUBLIC_HEADER "${GGML_PUBLIC_HEADERS}")
+ #if (GGML_METAL)
+ #    set_target_properties(ggml PROPERTIES RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/ggml-metal.metal")
+ #endif()
+-install(TARGETS ggml LIBRARY PUBLIC_HEADER)
+-install(TARGETS ggml-base LIBRARY)
++install(
++  TARGETS ggml ggml-base
++  EXPORT ggml-targets)
++
++install(
++  EXPORT ggml-targets
++  FILE ggml-targets.cmake
++  NAMESPACE ggml::
++  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/ggml)
+ 
+ if (GGML_STANDALONE)
+     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ggml.pc.in
+@@ -349,7 +356,7 @@ set(GGML_BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Location of
+ configure_package_config_file(
+         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ggml-config.cmake.in
+         ${CMAKE_CURRENT_BINARY_DIR}/ggml-config.cmake
+-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ggml
++    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/ggml
+     PATH_VARS GGML_INCLUDE_INSTALL_DIR
+               GGML_LIB_INSTALL_DIR
+               GGML_BIN_INSTALL_DIR)
+@@ -361,8 +368,7 @@ write_basic_package_version_file(
+ 
+ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ggml-config.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/ggml-version.cmake
+-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ggml)
+-
++        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/ggml)
+ if (MSVC)
+     set(MSVC_WARNING_FLAGS
+         /wd4005  # Macro redefinition
+diff --git a/ggml/src/CMakeLists.txt b/ggml/src/CMakeLists.txt
+index 17c9366f..9d2c223a 100644
+--- a/ggml/src/CMakeLists.txt
++++ b/ggml/src/CMakeLists.txt
+@@ -231,7 +231,7 @@ function(ggml_add_backend_library backend)
+     else()
+         add_library(${backend} ${ARGN})
+         target_link_libraries(ggml PUBLIC ${backend})
+-        install(TARGETS ${backend} LIBRARY)
++        install(TARGETS ${backend} EXPORT ggml-targets)
+     endif()
+ 
+     target_link_libraries(${backend} PRIVATE ggml-base)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 70be604e..25d56105 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -7,7 +7,6 @@ llama_add_compile_flags()
+ # llama
+ 
+ add_library(llama
+-            ../include/llama.h
+             llama.cpp
+             llama-adapter.cpp
+             llama-arch.cpp
+@@ -33,11 +32,15 @@ add_library(llama
+             llama-vocab.cpp
+             unicode-data.cpp
+             unicode.cpp
+-            unicode.h
+             )
+ 
+ target_include_directories(llama PRIVATE .)
+-target_include_directories(llama PUBLIC ../include)
++target_include_directories(
++  llama
++  PUBLIC
++    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
++    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/llama>)
++
+ target_compile_features   (llama PRIVATE cxx_std_17) # don't bump
+ 
+ target_link_libraries(llama PUBLIC ggml)
