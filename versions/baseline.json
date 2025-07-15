@@ -52,6 +52,10 @@
       "baseline": "2024-09-22",
       "port-version": 0
     },
+    "whisper-cpp": {
+      "baseline": "1.7.6",
+      "port-version": 0
+    },
     "xnnpack": {
       "baseline": "onnxruntime",
       "port-version": 0
