@@ -1,6 +1,7 @@
 {
   "name": "qvac-lib-inference-addon-cpp",
   "version": "0.7.0",
+  "port-version": 1,
   "dependencies": [
     "qvac-lint-cpp",
     {
@@ -10,8 +11,7 @@
     {
       "name": "vcpkg-cmake-config",
       "host": true
-    },
-    "qvac-lint-cpp"
+    }
   ],
   "features": {
     "tests": {
