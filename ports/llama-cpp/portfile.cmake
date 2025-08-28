@@ -1,8 +1,10 @@
 vcpkg_from_github(
   OUT_SOURCE_PATH SOURCE_PATH
   REPO tetherto/qvac-ext-lib-llama.cpp
-  REF b${VERSION}-mtmd
-  SHA512 1a913d81d7dcafe02dfd76bb116681a198c903ff6ce7d9be0e671cf4654507ed542b7a415d882762ec8340a530b96dd7d72c6c6aa476f1d64ad5f3083a633dea
+  REF b${VERSION}
+  SHA512 cd555ac75c1ebed571f6461d893a5460c65ac78379a4759b807a7acf23fed358ed0db4ed026068b8beea0a6be38b26cafd8fa87ac12cee9ae0c649dc2431867a
+  PATCHES
+    "only-mtmd.patch"
 )
 
 if (VCPKG_TARGET_IS_ANDROID)
