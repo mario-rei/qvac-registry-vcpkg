@@ -36,6 +36,10 @@
       "baseline": "2024.10.24",
       "port-version": 0
     },
+    "piper": {
+      "baseline": "1.2.0",
+      "port-version": 1
+    },
     "piper-phonemize": {
       "baseline": "1.2.0",
       "port-version": 1
