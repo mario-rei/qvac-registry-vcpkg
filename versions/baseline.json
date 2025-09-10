@@ -17,8 +17,8 @@
       "port-version": 1
     },
     "llama-cpp": {
-      "baseline": "5932.1.0",
-      "port-version": 1
+      "baseline": "6435.0.0",
+      "port-version": 0
     },
     "onnx": {
       "baseline": "onnxruntime",
