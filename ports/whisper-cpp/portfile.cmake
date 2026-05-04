@@ -1,9 +1,14 @@
 
+# TODO(QVAC-18300): flip back to tetherto/qvac-ext-lib-whisper.cpp REF v${VERSION}
+# once the upstream sync (mario-rei branch feat/upstream-sync-v1.8.4.3) is
+# pushed to tetherto and tagged as v1.8.4.3. The SHA below pins the merge
+# commit produced during the v1.8.4.3 prep (upstream ggml-org/whisper.cpp
+# master merged on top of tetherto BCI patches).
 vcpkg_from_github(
   OUT_SOURCE_PATH SOURCE_PATH
-  REPO tetherto/qvac-ext-lib-whisper.cpp
-  REF v${VERSION}
-  SHA512 8d265bf6c0dd6e82fbc05d3b083ac0c721df4d75cb536d170eee3a4d810fdc421f79f383682fa6912aa8551a5115c4240105e00070855193df7ec41e4f6a4d83
+  REPO mario-rei/qvac-ext-lib-whisper.cpp
+  REF 1318aee92eb807b32ff0419bd431cf0dbd2128b3
+  SHA512 edf81747b243f22ed4d94042e51796b9c1c0e562a96175713dd93bf6382b5633bc26014a633426bf5d152e2edca8283bcad0db107ecd596acedae82c51270ea2
   HEAD_REF master
 )
 
@@ -44,6 +49,21 @@ else()
   list(APPEND PLATFORM_OPTIONS -DGGML_VULKAN=OFF)
 endif()
 
+if(VCPKG_TARGET_IS_ANDROID)
+  set(DL_BACKENDS ON)
+  list(APPEND PLATFORM_OPTIONS
+    -DGGML_BACKEND_DL=ON
+    -DGGML_CPU_ALL_VARIANTS=ON
+    -DGGML_CPU_REPACK=ON
+    -DGGML_VULKAN_DISABLE_COOPMAT=ON
+    -DGGML_VULKAN_DISABLE_COOPMAT2=ON)
+  if("opencl" IN_LIST FEATURES)
+    list(APPEND PLATFORM_OPTIONS -DGGML_OPENCL=ON)
+  endif()
+else()
+  set(DL_BACKENDS OFF)
+endif()
+
 vcpkg_cmake_configure(
   SOURCE_PATH "${SOURCE_PATH}"
   DISABLE_PARALLEL_CONFIGURE
@@ -73,7 +93,7 @@ vcpkg_copy_pdbs()
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
 
-if (VCPKG_LIBRARY_LINKAGE MATCHES "static")
+if (NOT DL_BACKENDS AND VCPKG_LIBRARY_LINKAGE MATCHES "static")
   file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/bin")
   file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/bin")
 endif()

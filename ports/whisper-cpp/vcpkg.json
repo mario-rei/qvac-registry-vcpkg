@@ -1,10 +1,14 @@
 {
   "name": "whisper-cpp",
-  "version": "1.8.4.2",
+  "version": "1.8.4.3",
   "description": "High-performance inference of OpenAI's Whisper automatic speech recognition (ASR) model",
   "homepage": "https://github.com/tetherto/qvac-ext-lib-whisper.cpp",
   "license": "MIT",
   "dependencies": [
+    {
+      "name": "opencl",
+      "platform": "android"
+    },
     {
       "name": "vcpkg-cmake",
       "host": true
@@ -15,6 +19,15 @@
     }
   ],
   "features": {
+    "opencl": {
+      "description": "Enable OpenCL GPU acceleration (Android only)",
+      "dependencies": [
+        {
+          "name": "opencl",
+          "platform": "android"
+        }
+      ]
+    },
     "vulkan": {
       "description": "Enable Vulkan GPU acceleration",
       "dependencies": [
