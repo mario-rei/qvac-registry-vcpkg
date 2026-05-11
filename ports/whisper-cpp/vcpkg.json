@@ -1,6 +1,7 @@
 {
   "name": "whisper-cpp",
   "version": "1.8.4.3",
+  "port-version": 1,
   "description": "High-performance inference of OpenAI's Whisper automatic speech recognition (ASR) model",
   "homepage": "https://github.com/tetherto/qvac-ext-lib-whisper.cpp",
   "license": "MIT",
@@ -18,6 +19,10 @@
     "vulkan": {
       "description": "Enable Vulkan GPU acceleration",
       "dependencies": [
+        {
+          "name": "spirv-headers",
+          "platform": "!osx & !ios"
+        },
         {
           "name": "vulkan",
           "platform": "!osx & !ios"
